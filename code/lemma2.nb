@@ -1,0 +1,98 @@
+(* This is a program computes the external angle of vertex configurations of FCC 1-neighborhood. *)
+
+alloffsets = {{2Sqrt[2/3],0,0},{-2 Sqrt[2/3],0,0},{0,2Sqrt[2/3],0},{0,-2 Sqrt[2/3],0}, {Sqrt[2/3],Sqrt[2/3],2/Sqrt[3]},{-Sqrt[(2/3)],Sqrt[2/3],2/Sqrt[3]},{Sqrt[2/3],-Sqrt[(2/3)],2/Sqrt[3]},{-Sqrt[(2/3)],-Sqrt[(2/3)],2/Sqrt[3]}, {Sqrt[2/3],Sqrt[2/3],-(2/Sqrt[3])},{-Sqrt[(2/3)],Sqrt[2/3],-(2/Sqrt[3])},{Sqrt[2/3],-Sqrt[(2/3)],2/-Sqrt[3]},{-Sqrt[(2/3)],-Sqrt[(2/3)],-(2/Sqrt[3])}};
+
+adj = {{{2 Sqrt[2/3], 0, 0}, {Sqrt[2/3], Sqrt[2/3], 2/Sqrt[
+     3]}}, {{2 Sqrt[2/3], 0, 0}, {Sqrt[2/3], -Sqrt[(2/3)], 2/Sqrt[3]}},
+   {{2 Sqrt[2/3], 0, 0}, {Sqrt[2/3], Sqrt[2/
+     3], -(2/Sqrt[3])}}, {{2 Sqrt[2/3], 0, 0}, {Sqrt[2/
+     3], -Sqrt[(2/3)], -(2/Sqrt[3])}},
+   {{-2 Sqrt[2/3], 0, 0}, {-Sqrt[(2/3)], Sqrt[2/3], 2/Sqrt[
+     3]}}, {{-2 Sqrt[2/3], 0, 0}, {-Sqrt[(2/3)], -Sqrt[(2/3)], 2/Sqrt[
+     3]}},
+   {{-2 Sqrt[2/3], 0, 0}, {-Sqrt[(2/3)], Sqrt[2/
+     3], -(2/Sqrt[3])}}, {{-2 Sqrt[2/3], 0, 
+     0}, {-Sqrt[(2/3)], -Sqrt[(2/3)], -(2/Sqrt[3])}},
+   {{0, 2 Sqrt[2/3], 0}, {-Sqrt[(2/3)], Sqrt[2/3], 2/Sqrt[3]}}, {{0, 
+     2 Sqrt[2/3], 0}, {Sqrt[2/3], Sqrt[2/3], 2/Sqrt[3]}},
+   {{0, 2 Sqrt[2/3], 0}, {-Sqrt[(2/3)], Sqrt[2/
+     3], -(2/Sqrt[3])}}, {{0, 2 Sqrt[2/3], 0}, {Sqrt[2/3], Sqrt[2/
+     3], -(2/Sqrt[3])}},
+   {{0, -2 Sqrt[2/3], 0}, {-Sqrt[(2/3)], -Sqrt[(2/3)], 2/Sqrt[
+     3]}}, {{0, -2 Sqrt[2/3], 0}, {Sqrt[2/3], -Sqrt[(2/3)], 2/Sqrt[
+     3]}},
+   {{0, -2 Sqrt[2/3], 
+     0}, {-Sqrt[(2/3)], -Sqrt[(2/3)], -(2/Sqrt[3])}}, {{0, -2 Sqrt[2/
+      3], 0}, {Sqrt[2/3], -Sqrt[(2/3)], -(2/Sqrt[3])}},
+   {{Sqrt[2/3], Sqrt[2/3], 2/Sqrt[3]}, {Sqrt[2/3], -Sqrt[(2/3)], 2/
+     Sqrt[3]}}, {{Sqrt[2/3], -Sqrt[(2/3)], 2/Sqrt[
+     3]}, {-Sqrt[(2/3)], -Sqrt[(2/3)], 2/Sqrt[3]}},
+   {{-Sqrt[(2/3)], -Sqrt[(2/3)], 2/Sqrt[3]}, {-Sqrt[(2/3)], Sqrt[2/3],
+      2/Sqrt[3]}}, {{-Sqrt[(2/3)], Sqrt[2/3], 2/Sqrt[3]}, {Sqrt[2/3], 
+     Sqrt[2/3], 2/Sqrt[3]}},
+   {{Sqrt[2/3], Sqrt[2/3], -(2/Sqrt[3])}, {Sqrt[2/
+     3], -Sqrt[(2/3)], -(2/Sqrt[3])}}, {{Sqrt[2/
+     3], -Sqrt[(2/3)], -(2/Sqrt[3])}, {-Sqrt[(2/3)], -Sqrt[(2/3)], -(
+      2/Sqrt[3])}},
+   {{-Sqrt[(2/3)], -Sqrt[(2/3)], -(2/Sqrt[3])}, {-Sqrt[(2/3)], Sqrt[2/
+     3], -(2/Sqrt[3])}}, {{-Sqrt[(2/3)], Sqrt[2/
+     3], -(2/Sqrt[3])}, {Sqrt[2/3], Sqrt[2/3], -(2/Sqrt[3])}}};
+
+
+(* This is snippet enumerates external faces not adjacent to {0, 0, 0} for rendering. *)
+
+chull = ConvexHullMesh[alloffsets];
+polys = Cases[Show[chull], _Polygon, Infinity];
+dictionary = PositionIndex[alloffsets];
+revdictionary = PositionIndex[dictionary];
+evalface[tuple_] := Map[revdictionary /@ addbrack, tuple];
+testlist = evalface /@ polys[[1]][[1]];
+evalface[tuple_] := Map[revdictionary, tuple];
+faceadj = evalface /@ testlist;
+flattentuple[tuple_] := tuple // Map[Flatten];
+faceadj = flattentuple /@ faceadj;
+
+(* This is loop enumerates all combinations of verticies in the 1-neighborhood of the FCC and calculates the external angle of {0, 0, 0} *)
+
+Do[
+containtest[numbers_] := ContainsAll[j, numbers];
+containanytest[numbers_] := ContainsAny[j, numbers];
+boundary = Union[Flatten[SymmetricDifference[Select[adj, containtest], Select[adj, containanytest]], 1]];
+listcheck = SymmetricDifference[alloffsets, Union[Flatten[SymmetricDifference[Select[adj, containtest], Select[adj, containanytest]], 1]]];
+remainedges = Select[adj, ContainsAny[#, boundary] == True &];  
+selectfilter[listchecker_] := If[Length[Select[remainedges, MemberQ[#, listchecker] == True &]] > 1, listchecker, {}];  
+addboundary = selectfilter /@ listcheck;
+addboundary = Select[addboundary, UnsameQ[#, {}] &];
+totalboundary = Join[boundary, addboundary];
+totalboundary = SymmetricDifference[totalboundary, SymmetricDifference[alloffsets, j]];  
+containsboundary[edge_] := SubsetQ[totalboundary, edge];   
+numfaces = Length[Select[containsboundary /@ adj, # == True &]];
+vertexdegcheck[vertex_] := Select[adj, MemberQ[#, vertex] == True &];
+edgedegcheck[listpos_] := Select[listpos, SubsetQ[#, j] == True &];  
+listselects = vertexdegcheck /@ j;
+vertbools = If[Length[Intersection[Union[Flatten[#, 1]], j]] > 2, True, False]  & /@ listselects;
+anscontinue = Length[Select[vertbools, # == True &]] == Length[j];
+insertzero[numbers_] := Insert[numbers, {0, 0, 0}, -1];
+ref = insertzero[j];
+containtest[numbers_] := ContainsAll[ref, numbers];
+adjwzeroref = Join[{{0, 0, 0}}, #] & /@ Select[adj, containtest];
+dictionaryref = PositionIndex[ref];
+faceadjselect = Select[faceadj, containtest];
+totalfaces = Join[faceadjselect, adjwzeroref];
+If[numfaces < 6, If[anscontinue, counter = counter + 1; Print[anscontinue, j, numfaces], Print[Length[j]]], Print[numfaces]]; , {j, Subsets[alloffsets,{ 11}]}]
+
+Print[counter];
+
+(* This is exports figures for inspection or video rendering *)
+
+counter = 0;
+Do[
+insertzero[numbers_] := Insert[numbers, {0, 0, 0}, -1];
+ref = insertzero[i];
+counter = counter + 1;
+containtest[numbers_] := ContainsAll[ref, numbers];
+adjwzeroref = Join[{{0, 0, 0}}, #] & /@ Select[adj, containtest];
+dictionaryref = PositionIndex[ref];
+faceadjselect = Select[faceadj, containtest];
+totalfaces = Join[faceadjselect, adjwzeroref];
+Export[counter = counter + 1; StringInsert["fig__lemma2.jpg", ToString @ counter, 5], Graphics3D[{Blue, Polyhedron[totalfaces]}] ], {i, Subsets[alloffsets,{11}]}]

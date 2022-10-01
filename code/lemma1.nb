@@ -1,0 +1,25 @@
+(* This program computes the genus of all configurations of a FCC 1-neighborhood. *)
+
+rdpoly = PolyhedronData["RhombicDodecahedron", "Polyhedron"];
+
+alloffsets = {{2Sqrt[2/3],0,0},{-2 Sqrt[2/3],0,0},{0,2Sqrt[2/3],0},{0,-2 Sqrt[2/3],0}, {Sqrt[2/3],Sqrt[2/3],2/Sqrt[3]},{-Sqrt[(2/3)],Sqrt[2/3],2/Sqrt[3]},{Sqrt[2/3],-Sqrt[(2/3)],2/Sqrt[3]},{-Sqrt[(2/3)],-Sqrt[(2/3)],2/Sqrt[3]}, {Sqrt[2/3],Sqrt[2/3],-(2/Sqrt[3])},{-Sqrt[(2/3)],Sqrt[2/3],-(2/Sqrt[3])},{Sqrt[2/3],-Sqrt[(2/3)],2/-Sqrt[3]},{-Sqrt[(2/3)],-Sqrt[(2/3)],-(2/Sqrt[3])}};
+
+gennbrhd[offsets_]:=RegionUnion @@ Table[CanonicalizePolyhedron[Translate[rdpoly,offset]],{offset,offsets}];    
+
+nbrhdgenus[offsets_]:=PolyhedronGenus[gennbrhd[offsets]];   
+
+(* This shows that the genus for subsets of 1...5 always yield a genus 0 configuration always. *)
+result_proof=Plus @@ nbrhdgenus /@ Subsets[alloffsets,{1, 5}]  # result =0, proving there are no higher genus than 0 in subsets of 1 to 5 particles
+
+(* This shows that the genus for subsets of 6+ a genus 0 configuration is not certain. *)
+disprove6 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{6}]  # result is 16
+disprove7 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{7}]  # result is216
+disprove8 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{8}]  # result is 300
+disprove9 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{9}]  # result is 136
+disprove10 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{10}] # result is 84
+disprove11 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{11}] # results is 24, 
+disprove12 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{12}]  # results in 3, sphere with hole in center
+
+(* This is exports figures for inspection or video rendering *)
+counter = 0
+Do [counter = counter + 1; Export[StringInsert["fig__lemma1.jpg", ToString @ counter, 5], Graphics3D[{Yellow, gennbrhd[i]}] ], {i, Subsets[alloffsets,{5}]}]
