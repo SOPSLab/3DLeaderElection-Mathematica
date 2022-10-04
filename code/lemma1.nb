@@ -9,17 +9,17 @@ gennbrhd[offsets_]:=RegionUnion @@ Table[CanonicalizePolyhedron[Translate[rdpoly
 nbrhdgenus[offsets_]:=PolyhedronGenus[gennbrhd[offsets]];   
 
 (* This shows that the genus for subsets of 1...5 always yield a genus 0 configuration always. *)
-result_proof=Plus @@ nbrhdgenus /@ Subsets[alloffsets,{1, 5}]  # result =0, proving there are no higher genus than 0 in subsets of 1 to 5 particles
+result_proof=Plus @@ nbrhdgenus /@ Subsets[alloffsets,{1, 5}] 
 
 (* This shows that the genus for subsets of 6+ a genus 0 configuration is not certain. *)
-disprove6 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{6}]  # result is 16
-disprove7 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{7}]  # result is216
-disprove8 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{8}]  # result is 300
-disprove9 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{9}]  # result is 136
-disprove10 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{10}] # result is 84
-disprove11 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{11}] # results is 24, 
-disprove12 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{12}]  # results in 3, sphere with hole in center
+disprove6 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{6}] 
+disprove7 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{7}]  
+disprove8 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{8}]  
+disprove9 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{9}]  
+disprove10 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{10}] 
+disprove11 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{11}] 
+disprove12 = Plus @@ nbrhdgenus /@ Subsets[alloffsets,{12}]  
 
 (* This is exports figures for inspection or video rendering *)
 counter = 0
-Do [counter = counter + 1; Export[StringInsert["fig__lemma1.jpg", ToString @ counter, 5], Graphics3D[{Yellow, gennbrhd[i]}] ], {i, Subsets[alloffsets,{5}]}]
+Do [counter = counter + 1; Export[StringInsert["fig__lemma1.jpg", ToString @ counter, 5], Graphics3D[{Yellow, gennbrhd[i]}] ], {i, Subsets[alloffsets,{6, 11}]}]
